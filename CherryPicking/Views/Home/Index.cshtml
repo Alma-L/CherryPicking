@@ -234,12 +234,36 @@
 </body>
 </html>
  *@
-<!DOCTYPE html>
+@* <!DOCTYPE html>
 <html>
 <head>
     <title>Cherry Picker Game</title>
     <!-- Include Bootstrap CSS -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        /* Set fixed dimensions for the cell buttons */
+        .cell {
+            width: 50px; /* Adjust width as needed */
+            height: 50px; /* Adjust height as needed */
+            line-height: 50px; /* Vertically center the content */
+            padding: 0; /* Remove padding */
+            text-align: center; /* Center content horizontally */
+        }
+
+        /* Set dimensions and styles for table cells */
+        td {
+            width: inherit; /* Inherit width from the cell buttons */
+            height: inherit; /* Inherit height from the cell buttons */
+            padding: 0; /* Remove padding */
+            text-align: center; /* Center content horizontally */
+            vertical-align: middle; /* Vertically center content */
+        }
+
+        /* Style for fruit icon */
+        .fruit {
+            font-size: 24px; /* Adjust font size as needed */
+        }
+    </style>
 </head>
 <body>
     <div class="container">
@@ -259,11 +283,13 @@
                                         <!-- Add icons based on cell values -->
                                         @if (Model.Grid[i][j] == 1)
                                         {
-                                            <span>&#127826;</span> <!-- Cherry icon -->
+                                            <!-- Cherry icon -->
+                                            <span class="fruit">&#127822;</span>
                                         }
                                         else if (Model.Grid[i][j] == -1)
                                         {
-                                            <span>&#128683;</span> <!-- Block icon -->
+                                            <!-- Block icon -->
+                                            <span>&#128683;</span>
                                         }
                                     </button>
                                 </td>
@@ -292,9 +318,9 @@
                 var value = $(this).data('value');
 
                 if (value === 1) {
-                    // If the cell contains a cherry, pick it up
+                    // If the cell contains a fruit, pick it up
                     $(this).data('value', 0);
-                    $(this).html('&#127822;'); // Change to apple icon
+                    $(this).html(''); // Clear the content of the cell
                     // Increment the cherries picked count and update the displayed count
                     var cherriesPicked = parseInt($('#cherriesCount').text()) + 1;
                     $('#cherriesCount').text(cherriesPicked);
@@ -310,7 +336,11 @@
                 for (var i = 0; i < n; i++) {
                     defaultGrid.push([]);
                     for (var j = 0; j < n; j++) {
-                        defaultGrid[i].push(getRandomValue());
+                        if (Math.random() < 0.5) { // Randomly select a fruit icon
+                            defaultGrid[i].push(1); // Cell contains fruit
+                        } else {
+                            defaultGrid[i].push(getRandomValue()); // Cell contains -1 or 0
+                        }
                     }
                 }
 
@@ -324,9 +354,14 @@
                     $(this).data('value', Model.Grid[row][col]);
                     // Change icons based on cell values
                     if (Model.Grid[row][col] === 1) {
-                        $(this).html('&#127826;'); // Cherry icon
+                        // Select a random fruit icon
+                        var randomFruit = getRandomFruitIcon();
+                        $(this).find('.fruit').html(randomFruit);
                     } else if (Model.Grid[row][col] === -1) {
                         $(this).html('&#128683;'); // Block icon
+                    } else {
+                        // If value is 0, leave the cell empty
+                        $(this).empty();
                     }
                 });
 
@@ -349,9 +384,170 @@
                 if (randomNum === 1) return 0;
                 return 1;
             }
+
+            // Function to get a random fruit icon
+            function getRandomFruitIcon() {
+                var fruitIcons = ['&#127822;', '&#127823;', '&#127815;', '&#127827;', '&#127819;']; // Array of fruit icons
+                var randomIndex = Math.floor(Math.random() * fruitIcons.length);
+                return fruitIcons[randomIndex];
+            }
         });
 
     </script>
+</body>
+</html>
+ *@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Cherry Picker Game</title>
+    <!-- Include Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        /* Set fixed dimensions for the cell buttons */
+        .cell {
+            width: 50px; /* Adjust width as needed */
+            height: 50px; /* Adjust height as needed */
+            line-height: 50px; /* Vertically center the content */
+            padding: 0; /* Remove padding */
+            text-align: center; /* Center content horizontally */
+        }
 
+        /* Set dimensions and styles for table cells */
+        td {
+            width: inherit; /* Inherit width from the cell buttons */
+            height: inherit; /* Inherit height from the cell buttons */
+            padding: 0; /* Remove padding */
+            text-align: center; /* Center content horizontally */
+            vertical-align: middle; /* Vertically center content */
+        }
+
+        /* Style for fruit icon */
+        .fruit {
+            font-size: 24px; /* Adjust font size as needed */
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2 class="mt-5 mb-3">Cherry Picker</h2>
+        <div class="form-group">
+            <label for="gridInput">Grid (Enter values for each cell):</label>
+            <table class="table table-bordered">
+                <tbody>
+                    @for (int i = 0; i < Model.Grid.Length; i++)
+                    {
+                        <tr>
+                            @for (int j = 0; j < Model.Grid[i].Length; j++)
+                            {
+                                <td>
+                                    <!-- Change cell into a button -->
+                                    <button class="cell btn btn-outline-dark" data-row="@i" data-col="@j" data-value="@Model.Grid[i][j]">
+                                        <!-- Add icons based on cell values -->
+                                        @if (Model.Grid[i][j] == 1)
+                                        {
+                                            <!-- Cherry icon -->
+                                            <span class="fruit">&#127822;</span>
+                                        }
+                                        else if (Model.Grid[i][j] == -1)
+                                        {
+                                            <!-- Block icon -->
+                                            <span>&#128683;</span>
+                                        }
+                                    </button>
+                                </td>
+                            }
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+        <!-- Display the cherries picked count -->
+        <div class="mt-3 cherries-picked">
+            Cherries Picked: <span id="cherriesCount">0</span>
+        </div>
+
+        <!-- Display the max cherries count -->
+        <div class="mt-3 max-cherries">
+            Max Cherries: <span id="maxCherries">0</span>
+        </div>
+
+        <!-- Button to generate a new grid -->
+        <button id="generateGridBtn" class="btn btn-primary mt-3">Generate New Grid</button>
+    </div>
+
+
+    <!-- Include jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            // Click event handler for cell buttons
+            $('.cell').click(function () {
+                pickCherry($(this));
+            });
+
+            // Keyboard event handler for playing with keys
+            $(document).keydown(function (event) {
+                var keyCode = event.keyCode;
+                var currentCell = $('.cell:focus');
+
+                if (keyCode === 13) { // Enter key
+                    pickCherry(currentCell);
+                } else {
+                    moveFocus(keyCode, currentCell);
+                }
+            });
+
+            // Function to pick up a cherry
+            function pickCherry(cell) {
+                var value = cell.data('value');
+
+                if (value === 1) {
+                    // If the cell contains a cherry, pick it up
+                    cell.data('value', 0);
+                    cell.html(''); // Clear the content of the cell
+                    // Increment the cherries picked count and update the displayed count
+                    var cherriesPicked = parseInt($('#cherriesCount').text()) + 1;
+                    $('#cherriesCount').text(cherriesPicked);
+                } else if (value === -1) {
+                    // If the cell is blocked, do nothing
+                    return;
+                }
+                // If the cell is empty, you can move through it
+            }
+
+            // Function to move focus based on arrow key press
+            function moveFocus(keyCode, currentCell) {
+                var row = currentCell.parent().index();
+                var col = currentCell.index();
+                var numRows = $('tr').length;
+                var numCols = $('td').length / numRows;
+
+                switch (keyCode) {
+                    case 37: // Left arrow
+                        col = Math.max(col - 1, 0);
+                        break;
+                    case 38: // Up arrow
+                        row = Math.max(row - 1, 0);
+                        break;
+                    case 39: // Right arrow
+                        col = Math.min(col + 1, numCols - 1);
+                        break;
+                    case 40: // Down arrow
+                        row = Math.min(row + 1, numRows - 1);
+                        break;
+                    default:
+                        return; // Exit this handler for other keys
+                }
+
+                // Ensure movement is allowed only to non-blocked cells and within grid boundaries
+                var targetCell = $('table tr').eq(row).find('td').eq(col).find('.cell');
+                var targetValue = targetCell.data('value');
+                if (targetValue !== -1) {
+                    targetCell.focus();
+                }
+            }
+        });
+    </script>
 </body>
 </html>

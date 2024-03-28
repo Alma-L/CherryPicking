@@ -447,12 +447,13 @@
                                         @if (Model.Grid[i][j] == 1)
                                         {
                                             <!-- Cherry icon -->
-                                            <span class="fruit">&#127822;</span>
+                                            <span class="fruit" style="color: red;">&#127826;</span>
+
                                         }
                                         else if (Model.Grid[i][j] == -1)
                                         {
                                             <!-- Block icon -->
-                                            <span>&#128683;</span>
+                                            <span class="block">&#128683;</span>
                                         }
                                     </button>
                                 </td>
@@ -481,6 +482,12 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
         $(document).ready(function () {
+            // Select the (0, 0) cell by default if it doesn't contain a block
+            var defaultCell = $('button[data-row="0"][data-col="0"]');
+            if (defaultCell.data('value') !== -1) {
+                defaultCell.focus();
+            }
+
             // Click event handler for cell buttons
             $('.cell').click(function () {
                 pickCherry($(this));
@@ -494,7 +501,13 @@
                 if (keyCode === 13) { // Enter key
                     pickCherry(currentCell);
                 } else {
-                    moveFocus(keyCode, currentCell);
+                    var nextCell = getNextCell(keyCode, currentCell);
+                    if (nextCell) {
+                        currentCell.blur(); // Remove focus from current cell
+                        nextCell.focus(); // Focus on next cell
+                        pickCherry(nextCell);
+                    }
+                    event.preventDefault(); // Prevent default behavior of arrow keys
                 }
             });
 
@@ -509,45 +522,43 @@
                     // Increment the cherries picked count and update the displayed count
                     var cherriesPicked = parseInt($('#cherriesCount').text()) + 1;
                     $('#cherriesCount').text(cherriesPicked);
-                } else if (value === -1) {
-                    // If the cell is blocked, do nothing
-                    return;
                 }
-                // If the cell is empty, you can move through it
             }
 
-            // Function to move focus based on arrow key press
-            function moveFocus(keyCode, currentCell) {
-                var row = currentCell.parent().index();
-                var col = currentCell.index();
+            // Function to get the next cell based on arrow key press
+            function getNextCell(keyCode, currentCell) {
+                var row = currentCell.data('row');
+                var col = currentCell.data('col');
                 var numRows = $('tr').length;
                 var numCols = $('td').length / numRows;
 
                 switch (keyCode) {
                     case 37: // Left arrow
-                        col = Math.max(col - 1, 0);
+                        if (col > 0 && $('button[data-row=' + row + '][data-col=' + (col - 1) + ']').data('value') !== -1) {
+                            return $('.cell[data-row=' + row + '][data-col=' + (col - 1) + ']');
+                        }
                         break;
                     case 38: // Up arrow
-                        row = Math.max(row - 1, 0);
+                        if (row > 0 && $('button[data-row=' + (row - 1) + '][data-col=' + col + ']').data('value') !== -1) {
+                            return $('.cell[data-row=' + (row - 1) + '][data-col=' + col + ']');
+                        }
                         break;
                     case 39: // Right arrow
-                        col = Math.min(col + 1, numCols - 1);
+                        if (col < numCols - 1 && $('button[data-row=' + row + '][data-col=' + (col + 1) + ']').data('value') !== -1) {
+                            return $('.cell[data-row=' + row + '][data-col=' + (col + 1) + ']');
+                        }
                         break;
                     case 40: // Down arrow
-                        row = Math.min(row + 1, numRows - 1);
+                        if (row < numRows - 1 && $('button[data-row=' + (row + 1) + '][data-col=' + col + ']').data('value') !== -1) {
+                            return $('.cell[data-row=' + (row + 1) + '][data-col=' + col + ']');
+                        }
                         break;
-                    default:
-                        return; // Exit this handler for other keys
                 }
-
-                // Ensure movement is allowed only to non-blocked cells and within grid boundaries
-                var targetCell = $('table tr').eq(row).find('td').eq(col).find('.cell');
-                var targetValue = targetCell.data('value');
-                if (targetValue !== -1) {
-                    targetCell.focus();
-                }
+                return null;
             }
         });
     </script>
 </body>
 </html>
+
+

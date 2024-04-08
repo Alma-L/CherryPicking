@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+﻿﻿<!DOCTYPE html>
 <html>
 <head>
     <title>Cherry Pickup Game</title>
@@ -18,9 +18,11 @@
             padding: 20px;
             border-radius: 10px; /* Add rounded corners to the container */
             box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.3); /* Add shadow effect */
-            margin-top: 50px;
+            /* margin-top: 50px; */
             position: relative; /* Position relative for absolute header and footer */
             min-height: calc(100vh - 200px); /* Minimum height to push footer down */
+            margin-bottom: 50px; /* Add margin at the bottom */
+        
         }
 
         .header, .footer {
@@ -242,6 +244,7 @@
                 return false;
             }
 
+
             // Initialize the selected cell based on blocked status of [0,0]
             var selectedRow, selectedCol;
             if (!isCellBlocked(0, 0)) {
@@ -265,30 +268,43 @@
                 var nextCell = getNextCell(selectedRow, selectedCol);
                 var value = nextCell.data('value');
 
+                // Check if the cell is not a thorn and is within the grid bounds
                 if (value !== -1) {
                     $('.cell').removeClass('selected-cell'); // Remove selected class from all cells
                     nextCell.addClass('selected-cell'); // Add selected class to the next cell
                     selectedRow = nextCell.data('row');
                     selectedCol = nextCell.data('col');
+                } else {
+                    event.preventDefault(); // Prevent moving through cells containing thorns
                 }
+
                 if (event.keyCode === 13) { // Enter key
-                    pickCherry(nextCell);
+                    if (value === 1) { // If the cell contains a cherry, pick it up
+                        pickCherry(nextCell);
+                    }
                 }
             });
 
+
             // Function to reset the game
             function resetGame() {
-                // Check if cell [0,0] is free or contains a block icon
-                var isCell00Blocked = isCellBlocked(0, 0);
-
                 // Reset all cells
                 $('.cell').each(function () {
-                    var randomValue = Math.random() < 0.5 ? 0 : 1; // 50% chance for cherry
-                    $(this).data('value', randomValue);
-                    $(this).html(randomValue === 0 ? '<span class="block">&#128683;</span>' : '<span class="fruit">&#127826;</span>');
+                    var randomValue = Math.random();
+                    if (randomValue < 0.25) {
+                        $(this).data('value', -1); // 25% chance for thorn
+                        $(this).html('<span class="block">&#128683;</span>'); // Add block icon
+                    } else if (randomValue < 0.75) {
+                        $(this).data('value', 1); // 50% chance for cherry
+                        $(this).html('<span class="fruit">&#127826;</span>'); // Add cherry icon
+                    } else {
+                        $(this).data('value', 0); // 25% chance for empty cell
+                        $(this).html(''); // Empty cell
+                    }
                 });
 
                 // Select the appropriate cell based on the status of cell [0,0]
+                var isCell00Blocked = isCellBlocked(0, 0);
                 if (!isCell00Blocked) {
                     selectedRow = 0;
                     selectedCol = 0;
@@ -332,5 +348,7 @@
             });
         });
     </script>
+
+
 </body>
 </html>

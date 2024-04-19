@@ -1,8 +1,9 @@
-﻿﻿<!DOCTYPE html>
+﻿@model CherryPicking.Models.CherryPickerModel
+
+<!DOCTYPE html>
 <html>
 <head>
-    <title>Cherry Pickup Game</title>
-    <!-- Include Bootstrap CSS -->
+    <title>Cherry Picker Game</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <style>
         body {
@@ -22,10 +23,9 @@
             position: relative; /* Position relative for absolute header and footer */
             min-height: calc(100vh - 200px); /* Minimum height to push footer down */
             margin-bottom: 50px; /* Add margin at the bottom */
-        
         }
 
-        .header, .footer {
+        .header {
             background-color: #333; /* Set header and footer background color */
             color: #fff; /* Set header and footer text color */
             padding: 10px; /* Add padding */
@@ -39,10 +39,7 @@
         }
 
         .footer {
-            bottom: 0; /* Align footer to the bottom */
-            text-align: center; /* Center text */
-            position: fixed; /* Fixed position for footer */
-            width: 100%; /* Full width */
+            display: none;
         }
 
         .cell {
@@ -83,14 +80,87 @@
             margin-top: 20px;
         }
 
-        .footer {
-            margin-top: 20px; /* Add margin to push footer down */
-        }
 
         /* Add style for the selected cell */
         .selected-cell {
             background-color: #444 !important; /* Darker background color */
             color: #fff; /* White text color */
+            border: 2px solid #950740;
+        }
+
+        .ml-2, .btn-outline-primary {
+            color: #fff;
+            margin-top: 20px;
+            border: 1px solid #950740;
+        }
+
+        .btn-outline-primary {
+            background-color: #950740;
+        }
+
+            .btn-outline-primary:hover {
+                color: #950740;
+                transition: .3s;
+                border: 1px solid #950740;
+                background: transparent;
+            }
+
+        .reset:hover {
+            color: #fff;
+            background: #950740;
+            transition: .3s;
+            border: 1px solid #950740;
+        }
+
+        .table-bordered td, .table-bordered th, .table-bordered tr, .table-bordered {
+            border: none;
+        }
+
+
+        .table-bordered {
+            background: rgba(255,255,255,.1);
+            backdrop-filter: blur(30px);
+            box-shadow: 1px 2px 28px 0px rgba(255,0,102,1);
+            border-radius: 2rem;
+            padding-top: 20px;
+        }
+
+        h1 {
+            font-size: 2rem;
+        }
+
+        .table-bordered {
+            width: 350px;
+            height: 350px;
+        }
+
+        .btn-outline-dark {
+            width: 85px;
+            height: 85px;
+        }
+
+        .container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+
+        .btn-container, .result-container {
+            display: flex;
+            justify-content: center;
+            align-content: center;
+            gap: 2rem;
+        }
+
+        .cell:hover {
+            border: 2px solid #950740;
+            transition: .3s;
+        }
+
+        h2 {
+            font-size: 1.5rem;
+            padding: 25px;
         }
     </style>
 </head>
@@ -99,101 +169,53 @@
         <h1 class="text-center">Welcome to Cherry Pickup Game</h1>
     </div>
 
-    <div class="grid-container">
-        <div class="form-group">
-            <label for="gridInput">Grid (Enter values for each cell):</label>
-            <table id="gridTable" class="table table-bordered">
-                <tbody>
+    <div class="container">
+        <h2>Please play the game:</h2>
+        <table id="gridTable" class="table table-bordered">
+            <tbody>
+                @for (int i = 0; i < Model.Grid.Length; i++)
+                {
                     <tr>
-                        <td>
-                            <!-- Change cell into a button -->
-                            <button class="cell btn btn-outline-dark" data-row="0" data-col="0" data-value="-1">
-                                <!-- Block icon -->
-                                <span class="block">&#128683;</span>
-                            </button>
-                        </td>
-                        <td>
-                            <!-- Change cell into a button -->
-                            <button class="cell btn btn-outline-dark pre-selected" data-row="0" data-col="1" data-value="1">
-                                <!-- Cherry icon -->
-                                <span class="fruit">&#127826;</span>
-                            </button>
-                        </td>
-                        <td>
-                            <!-- Change cell into a button -->
-                            <button class="cell btn btn-outline-dark" data-row="0" data-col="2" data-value="-1">
-                                <!-- Block icon -->
-                                <span class="block">&#128683;</span>
-                            </button>
-                        </td>
+                        @for (int j = 0; j < Model.Grid[i].Length; j++)
+                        {
+                            <td class="table-data">
+                                <button class="cell btn btn-outline-dark" data-row="@i" data-col="@j" data-value="@Model.Grid[i][j]">
+                                    @if (Model.Grid[i][j] == 1)
+                                    {
+                                        <span class="fruit">&#127826;</span>
+                                    }
+                                    else if (Model.Grid[i][j] == -1)
+                                    {
+                                        <span class="block">&#128683;</span>
+                                    }
+                                </button>
+                            </td>
+                        }
                     </tr>
-                    <tr>
-                        <td>
-                            <!-- Change cell into a button -->
-                            <button class="cell btn btn-outline-dark" data-row="1" data-col="0" data-value="-1">
-                                <!-- Block icon -->
-                                <span class="block">&#128683;</span>
-                            </button>
-                        </td>
-                        <td>
-                            <!-- Change cell into a button -->
-                            <button class="cell btn btn-outline-dark" data-row="1" data-col="1" data-value="1">
-                                <!-- Cherry icon -->
-                                <span class="fruit">&#127826;</span>
-                            </button>
-                        </td>
-                        <td>
-                            <!-- Change cell into a button -->
-                            <button class="cell btn btn-outline-dark" data-row="1" data-col="2" data-value="0">
-                            </button>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <!-- Change cell into a button -->
-                            <button class="cell btn btn-outline-dark" data-row="2" data-col="0" data-value="-1">
-                                <!-- Block icon -->
-                                <span class="block">&#128683;</span>
-                            </button>
-                        </td>
-                        <td>
-                            <!-- Change cell into a button -->
-                            <button class="cell btn btn-outline-dark" data-row="2" data-col="1" data-value="0">
-                            </button>
-                        </td>
-                        <td>
-                            <!-- Change cell into a button -->
-                            <button class="cell btn btn-outline-dark" data-row="2" data-col="2" data-value="1">
-                                <!-- Cherry icon -->
-                                <span class="fruit">&#127826;</span>
-                            </button>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-        <!-- Display the cherries picked count -->
-        <div class="mt-3 cherries-picked">
-            Cherries Picked: <span id="cherriesCount">0</span>
+                }
+            </tbody>
+        </table>
+        <div class="result-container">
+            <div class="cherries-picked">Cherries Picked: <span id="cherriesCount">0</span></div>
+            <div class="max-cherries">Max Cherries: <span id="maxCherries">0</span></div>
+            <div class="max-cherries">Results: <span id="idresults">0</span></div>
         </div>
 
-        <!-- Display the max cherries count -->
-        <div class="mt-3 max-cherries">
-            Max Cherries: <span id="maxCherries">0</span>
+        <div class="btn-container">
+            <button id="resetGameBtn" class="btn btn-outline-primary">Reset Game</button>
+            <button id="calculateCherriesBtn" class="btn btn-outline-primary ml-2">Calculate Cherries</button>
         </div>
 
-        <!-- Button to reset the game -->
-        <button id="resetGameBtn" class="btn btn-primary mt-3">Reset Game</button>
-    </div>
 
-    <div class="footer">
-        <p class="text-center">&copy; 2024 Cherry Picker Game. All rights reserved.</p>
     </div>
 
     <!-- Include jQuery -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
         $(document).ready(function () {
+            var selectedRow = 0;
+            var selectedCol = 0;
+
             // Function to check if a cell is blocked
             function isCellBlocked(row, col) {
                 return $('button[data-row="' + row + '"][data-col="' + col + '"]').data('value') === -1;
@@ -213,78 +235,48 @@
                 }
             }
 
-            // Function to get the next cell based on arrow key press
-            function getNextCell(row, col) {
-                var numRows = $('tr').length;
-                var numCols = $('td').length / numRows;
+            // Function to move the selected cell
+            function moveSelection(rowOffset, colOffset) {
+                var newRow = selectedRow + rowOffset;
+                var newCol = selectedCol + colOffset;
 
-                switch (event.keyCode) {
-                    case 37: // Left arrow
-                        col = (col - 1 + numCols) % numCols; // Ensure wrapping around
-                        break;
-                    case 38: // Up arrow
-                        row = (row - 1 + numRows) % numRows; // Ensure wrapping around
-                        break;
-                    case 39: // Right arrow
-                        col = (col + 1) % numCols; // Ensure wrapping around
-                        break;
-                    case 40: // Down arrow
-                        row = (row + 1) % numRows; // Ensure wrapping around
-                        break;
+                // Check if the new cell is within the bounds of the grid
+                if (newRow >= 0 && newRow < $('tr').length && newCol >= 0 && newCol < $('tr:first td').length) {
+                    var nextCell = $('button[data-row="' + newRow + '"][data-col="' + newCol + '"]');
+                    if (!isCellBlocked(newRow, newCol)) {
+                        $('.cell').removeClass('selected-cell'); // Remove selected class from all cells
+                        nextCell.addClass('selected-cell'); // Add selected class to the next cell
+                        selectedRow = newRow;
+                        selectedCol = newCol;
+                    }
                 }
-                return $('button[data-row="' + row + '"][data-col="' + col + '"]');
             }
-
-            // Function to check if the game is over
-            function checkGameOver() {
-                if (isCellBlocked(0, 0) && isCellBlocked(2, 2)) {
-                    alert("Game Over: You can't pick any cherry!");
-                    return true;
-                }
-                return false;
-            }
-
-
-            // Initialize the selected cell based on blocked status of [0,0]
-            var selectedRow, selectedCol;
-            if (!isCellBlocked(0, 0)) {
-                selectedRow = 0;
-                selectedCol = 0;
-            } else {
-                selectedRow = 2;
-                selectedCol = 2;
-            }
-
-            // Check if the game is over at the start
-            if (checkGameOver()) {
-                return; // Exit the initialization process
-            }
-
-            var defaultCell = $('button[data-row="' + selectedRow + '"][data-col="' + selectedCol + '"]');
-            defaultCell.addClass('selected-cell');
 
             // Keyboard event handler for playing with keys
             $(document).keydown(function (event) {
-                var nextCell = getNextCell(selectedRow, selectedCol);
-                var value = nextCell.data('value');
-
-                // Check if the cell is not a thorn and is within the grid bounds
-                if (value !== -1) {
-                    $('.cell').removeClass('selected-cell'); // Remove selected class from all cells
-                    nextCell.addClass('selected-cell'); // Add selected class to the next cell
-                    selectedRow = nextCell.data('row');
-                    selectedCol = nextCell.data('col');
-                } else {
-                    event.preventDefault(); // Prevent moving through cells containing thorns
+                switch (event.keyCode) {
+                    case 37: // Left arrow
+                        moveSelection(0, -1);
+                        break;
+                    case 38: // Up arrow
+                        moveSelection(-1, 0);
+                        break;
+                    case 39: // Right arrow
+                        moveSelection(0, 1);
+                        break;
+                    case 40: // Down arrow
+                        moveSelection(1, 0);
+                        break;
+                    case 13: // Enter key
+                        var currentCell = $('button[data-row="' + selectedRow + '"][data-col="' + selectedCol + '"]');
+                        pickCherry(currentCell);
+                        break;
+                    default:
+                        return; // Exit if the key pressed is not an arrow key or Enter key
                 }
 
-                if (event.keyCode === 13) { // Enter key
-                    if (value === 1) { // If the cell contains a cherry, pick it up
-                        pickCherry(nextCell);
-                    }
-                }
+                event.preventDefault(); // Prevent default browser behavior for arrow keys and Enter key
             });
-
 
             // Function to reset the game
             function resetGame() {
@@ -346,9 +338,33 @@
             $('#resetGameBtn').click(function () {
                 resetGame();
             });
+
+            $('#calculateCherriesBtn').click(function () {
+                var grid = [];
+                $('#gridTable tbody tr').each(function () {
+                    var rowData = [];
+                    $(this).find('td button').each(function () {
+                        var value = parseInt($(this).data('value'));
+                        rowData.push(value);
+                    });
+                    grid.push(rowData);
+                });
+
+                $.ajax({
+                    url: '/Home/CalculateCherries',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify(grid),
+                    success: function (data) {
+                        $('#idresults').text(data.maxCherries);
+                    },
+                    error: function () {
+                        alert('Error occurred while calculating cherries.');
+                    }
+                });
+            });
         });
     </script>
-
 
 </body>
 </html>

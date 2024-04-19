@@ -1,8 +1,5 @@
 using CherryPicking.Models;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
-using System;
-using System.Diagnostics;
 
 namespace CherryPicking.Controllers
 {
@@ -39,10 +36,15 @@ namespace CherryPicking.Controllers
         }
 
         [HttpPost]
-        public IActionResult CalculateCherries(CherryPickerModel model)
+        public IActionResult CalculateCherries([FromBody] int[][] grid)
         {
-            model.MaxCherries = CherryPickup(model.Grid);
-            return View("Index", model);
+            if (grid == null)
+            {
+                return BadRequest("Grid data is null.");
+            }
+
+            int maxCherries = CherryPickup(grid);
+            return Json(new { maxCherries });
         }
 
         public int CherryPickup(int[][] grid)

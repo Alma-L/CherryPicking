@@ -215,6 +215,111 @@
         $(document).ready(function () {
             var selectedRow = 0;
             var selectedCol = 0;
+            var initialGridState = null;
+
+            // Function to initialize the grid with the initial state
+            function initializeGrid() {
+                if (initialGridState) {
+                    for (var i = 0; i < initialGridState.length; i++) {
+                        for (var j = 0; j < initialGridState[i].length; j++) {
+                            var cellValue = initialGridState[i][j];
+                            var cellButton = $('button[data-row="' + i + '"][data-col="' + j + '"]');
+                            cellButton.data('value', cellValue);
+                            if (cellValue === 1) {
+                                cellButton.html('<span class="fruit">&#127826;</span>');
+                            } else if (cellValue === -1) {
+                                cellButton.html('<span class="block">&#128683;</span>');
+                            } else {
+                                cellButton.html('');
+                            }
+                        }
+                    }
+                }
+            }
+
+            // Function to store the initial grid state
+            function storeInitialGridState() {
+                initialGridState = [];
+                $('#gridTable tbody tr').each(function () {
+                    var rowData = [];
+                    $(this).find('td button').each(function () {
+                        rowData.push(parseInt($(this).data('value')));
+                    });
+                    initialGridState.push(rowData);
+                });
+            }
+
+            // Function to check if positions (0,0) and (2,2) have blocked icons
+            function checkGameOver() {
+                var isCell00Blocked = isCellBlocked(0, 0);
+                var isCell22Blocked = isCellBlocked(2, 2);
+
+                if (isCell00Blocked && isCell22Blocked) {
+                    // Both positions are blocked, trigger the game over alert
+                    alert('Game Over! Both starting and ending positions are blocked.');
+                }
+            }
+
+            checkGameOver();
+
+            // Function to reset the game
+            function resetGame() {
+                // Reset all cells
+                $('.cell').each(function () {
+                    var randomValue = Math.random();
+                    if (randomValue < 0.25) {
+                        $(this).data('value', -1); // 25% chance for thorn
+                        $(this).html('<span class="block">&#128683;</span>'); // Add block icon
+                    } else if (randomValue < 0.75) {
+                        $(this).data('value', 1); // 50% chance for cherry
+                        $(this).html('<span class="fruit">&#127826;</span>'); // Add cherry icon
+                    } else {
+                        $(this).data('value', 0); // 25% chance for empty cell
+                        $(this).html(''); // Empty cell
+                    }
+                });
+
+                // Store the initial grid state
+                storeInitialGridState();
+
+                // Initialize the grid with the initial state
+                initializeGrid();
+
+                // Select the appropriate cell based on the status of cell [0,0]
+                var isCell00Blocked = isCellBlocked(0, 0);
+                if (!isCell00Blocked) {
+                    selectedRow = 0;
+                    selectedCol = 0;
+                } else {
+                    selectedRow = 2;
+                    selectedCol = 2;
+                }
+
+                // Update game variables after resetting the game
+                updateGameVariables();
+
+                // Remove selected-cell class from all cells
+                $('.cell').removeClass('selected-cell');
+
+                // Add selected-cell class to the selected cell
+                $('button[data-row="' + selectedRow + '"][data-col="' + selectedCol + '"]').addClass('selected-cell');
+            }
+
+            // Function to update the game variables and display counts
+            function updateGameVariables() {
+                var cherriesPicked = 0;
+                var maxCherries = 0;
+                $('.cell').each(function () {
+                    if ($(this).data('value') === 1) {
+                        maxCherries++;
+                    }
+                    if ($(this).data('value') === 1 && $(this).html() === '<span class="fruit">&#127826;</span>') {
+                        cherriesPicked++;
+                    }
+                });
+                $('#cherriesCount').text(cherriesPicked);
+                $('#maxCherries').text(maxCherries);
+            }
 
             // Function to check if a cell is blocked
             function isCellBlocked(row, col) {
@@ -278,68 +383,24 @@
                 event.preventDefault(); // Prevent default browser behavior for arrow keys and Enter key
             });
 
-            // Function to reset the game
-            function resetGame() {
-                // Reset all cells
-                $('.cell').each(function () {
-                    var randomValue = Math.random();
-                    if (randomValue < 0.25) {
-                        $(this).data('value', -1); // 25% chance for thorn
-                        $(this).html('<span class="block">&#128683;</span>'); // Add block icon
-                    } else if (randomValue < 0.75) {
-                        $(this).data('value', 1); // 50% chance for cherry
-                        $(this).html('<span class="fruit">&#127826;</span>'); // Add cherry icon
-                    } else {
-                        $(this).data('value', 0); // 25% chance for empty cell
-                        $(this).html(''); // Empty cell
-                    }
-                });
-
-                // Select the appropriate cell based on the status of cell [0,0]
-                var isCell00Blocked = isCellBlocked(0, 0);
-                if (!isCell00Blocked) {
-                    selectedRow = 0;
-                    selectedCol = 0;
-                } else {
-                    selectedRow = 2;
-                    selectedCol = 2;
-                }
-
-                // Update game variables after resetting the game
-                updateGameVariables();
-
-                // Remove selected-cell class from all cells
-                $('.cell').removeClass('selected-cell');
-
-                // Add selected-cell class to the selected cell
-                $('button[data-row="' + selectedRow + '"][data-col="' + selectedCol + '"]').addClass('selected-cell');
-            }
-
-            // Function to update the game variables and display counts
-            function updateGameVariables() {
-                var cherriesPicked = 0;
-                var maxCherries = 0;
-                $('.cell').each(function () {
-                    if ($(this).data('value') === 1) {
-                        maxCherries++;
-                    }
-                    if ($(this).data('value') === 1 && $(this).html() === '<span class="fruit">&#127826;</span>') {
-                        cherriesPicked++;
-                    }
-                });
-                $('#cherriesCount').text(cherriesPicked);
-                $('#maxCherries').text(maxCherries);
-            }
+            
+           
 
             // Initialize the game
             resetGame();
+
 
             // Button click event handler for resetting the game
             $('#resetGameBtn').click(function () {
                 resetGame();
             });
 
+            // Button click event handler for calculating cherries
             $('#calculateCherriesBtn').click(function () {
+                // Restore the initial grid state before calculating cherries
+                initializeGrid();
+
+                // Perform the calculation
                 var grid = [];
                 $('#gridTable tbody tr').each(function () {
                     var rowData = [];
@@ -365,6 +426,5 @@
             });
         });
     </script>
-
 </body>
 </html>

@@ -162,12 +162,28 @@
             font-size: 1.5rem;
             padding: 25px;
         }
+
+        /* Message on modal */
+        #messageBody {
+            color: #000;
+        }
+
+        /*Label on modal*/
+        #messageModalLabel {
+            color: #000;
+        }
+
+        .hidden {
+            display: none;
+        }
     </style>
 </head>
 <body>
     <div class="header">
         <h1 class="text-center">Welcome to Cherry Pickup Game</h1>
     </div>
+
+    <div id="toast" class="hidden"></div>
 
     <div class="container">
         <h2>Please play the game:</h2>
@@ -197,8 +213,8 @@
         </table>
         <div class="result-container">
             <div class="cherries-picked">Cherries Picked: <span id="cherriesCount">0</span></div>
-            <div class="max-cherries">Max Cherries: <span id="maxCherries">0</span></div>
-            <div class="max-cherries">Results: <span id="idresults">0</span></div>
+@*             <div class="max-cherries">Max Cherries: <span id="maxCherries">0</span></div> *@
+            <div class="max-cherries"> Excepted Results: <span id="idresults">0</span></div>
         </div>
 
         <div class="btn-container">
@@ -207,6 +223,26 @@
         </div>
 
 
+    </div>
+
+    <!-- Modal for GameOver -->
+    <div class="modal fade" id="messageModal" tabindex="-1" aria-labelledby="messageModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="messageModalLabel">Message</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body" id="messageBody">
+                    <!-- Message content will be inserted here -->
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
     </div>
 
     <!-- Include jQuery -->
@@ -249,6 +285,34 @@
                 });
             }
 
+            // ShowMessage on modal
+            function showMessage(message) {
+                $('#messageBody').text(message);
+                $('#messageModal').modal('show');
+            }
+
+            // Function to close the dialog
+            function closeModal() {
+                $('#messageModal').modal('hide');
+            }
+
+            $('#messageModal').modal({
+                backdrop: 'static', // Prevent closing from outside
+                keyboard: false // Prevent closing with the Escape key
+            });
+
+            // Event handler for the close button
+            $('#messageModal .modal-footer .btn-secondary').click(function () {
+                closeModal();
+                resetGame();
+            });
+
+            // Event handler for the X button
+            $('#messageModal .modal-header .close').click(function () {
+                closeModal();
+                resetGame();
+            });
+
             // Function to check if positions (0,0) and (2,2) have blocked icons
             function checkGameOver() {
                 var isCell00Blocked = isCellBlocked(0, 0);
@@ -256,7 +320,8 @@
 
                 if (isCell00Blocked && isCell22Blocked) {
                     // Both positions are blocked, trigger the game over alert
-                    alert('Game Over! Both starting and ending positions are blocked.');
+                    showMessage('Game Over! Both starting and ending positions are blocked.');
+                    //resetGame();
                 }
             }
 
@@ -309,6 +374,8 @@
             function updateGameVariables() {
                 var cherriesPicked = 0;
                 var maxCherries = 0;
+                var results = 0;
+
                 $('.cell').each(function () {
                     if ($(this).data('value') === 1) {
                         maxCherries++;
@@ -319,6 +386,7 @@
                 });
                 $('#cherriesCount').text(cherriesPicked);
                 $('#maxCherries').text(maxCherries);
+                $('#idresults').text(results);
             }
 
             // Function to check if a cell is blocked
@@ -383,16 +451,16 @@
                 event.preventDefault(); // Prevent default browser behavior for arrow keys and Enter key
             });
 
-            
-           
-
             // Initialize the game
             resetGame();
 
-
             // Button click event handler for resetting the game
             $('#resetGameBtn').click(function () {
+
                 resetGame();
+                // setTimeout(function () {
+                checkGameOver(); // Call checkGameOver() after a delay of 1 second
+                // }, 1000); // 1000 milliseconds = 1 second
             });
 
             // Button click event handler for calculating cherries

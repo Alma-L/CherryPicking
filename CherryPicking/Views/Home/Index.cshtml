@@ -176,6 +176,66 @@
         .hidden {
             display: none;
         }
+
+        /* Style for the modal dialog */
+        .modal-content {
+            background-color: #444;
+            color: #fff;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        .modal-header {
+            background-color: #333;
+            color: #fff;
+            border-top-left-radius: 10px;
+            border-top-right-radius: 10px;
+            padding: 15px;
+            border-bottom: none;
+        }
+
+        .modal-body {
+            background-color: #444;
+            padding: 20px;
+        }
+
+        .modal-footer {
+            background-color: #333;
+            border-bottom-left-radius: 10px;
+            border-bottom-right-radius: 10px;
+            padding: 15px;
+            border-top: none;
+        }
+
+        /* Close button style */
+        .close {
+            color: #fff;
+            opacity: 1;
+            outline: none;
+        }
+
+            .close:hover {
+                color: #fff;
+                opacity: 0.8;
+            }
+
+             /* Button style */
+             .btn {
+               background-color: #950740;
+               border-color: #950740;
+             }
+
+            .btn:hover {
+                background-color: #74062c;
+                border-color: #74062c;
+            }
+
+        /* Text color */
+        #messageBody, #messageModalLabel {
+            color: #fff;
+        }
+
+      
     </style>
 </head>
 <body>
@@ -213,7 +273,6 @@
         </table>
         <div class="result-container">
             <div class="cherries-picked">Cherries Picked: <span id="cherriesCount">0</span></div>
-@*             <div class="max-cherries">Max Cherries: <span id="maxCherries">0</span></div> *@
             <div class="max-cherries"> Excepted Results: <span id="idresults">0</span></div>
         </div>
 
@@ -221,8 +280,6 @@
             <button id="resetGameBtn" class="btn btn-outline-primary">Reset Game</button>
             <button id="calculateCherriesBtn" class="btn btn-outline-primary ml-2">Calculate Cherries</button>
         </div>
-
-
     </div>
 
     <!-- Modal for GameOver -->
@@ -252,6 +309,7 @@
             var selectedRow = 0;
             var selectedCol = 0;
             var initialGridState = null;
+
 
             // Function to initialize the grid with the initial state
             function initializeGrid() {
@@ -332,12 +390,12 @@
                 // Reset all cells
                 $('.cell').each(function () {
                     var randomValue = Math.random();
-                    if (randomValue < 0.25) {
-                        $(this).data('value', -1); // 25% chance for thorn
-                        $(this).html('<span class="block">&#128683;</span>'); // Add block icon
-                    } else if (randomValue < 0.75) {
+                    if (randomValue < 0.5) {
                         $(this).data('value', 1); // 50% chance for cherry
                         $(this).html('<span class="fruit">&#127826;</span>'); // Add cherry icon
+                    } else if (randomValue < 0.75) {
+                        $(this).data('value', -1); // 25% chance for block
+                        $(this).html('<span class="block">&#128683;</span>'); // Add block icon
                     } else {
                         $(this).data('value', 0); // 25% chance for empty cell
                         $(this).html(''); // Empty cell
@@ -465,6 +523,7 @@
 
             // Button click event handler for calculating cherries
             $('#calculateCherriesBtn').click(function () {
+
                 // Restore the initial grid state before calculating cherries
                 initializeGrid();
 
@@ -485,7 +544,14 @@
                     contentType: 'application/json',
                     data: JSON.stringify(grid),
                     success: function (data) {
+                        console.log(data); // Log the entire response data
                         $('#idresults').text(data.maxCherries);
+                        if (data.maxCherries === 0) {
+                            showMessage('Sorry to inform, algorithm can not calculate your fruit picked.');
+                        } else {
+                            var cherriesPickedMessage = 'You have picked ' + data.maxCherries + ' cherries.';
+                            showMessage(cherriesPickedMessage);
+                        }
                     },
                     error: function () {
                         alert('Error occurred while calculating cherries.');

@@ -235,7 +235,6 @@
             color: #fff;
         }
 
-      
     </style>
 </head>
 <body>
@@ -244,6 +243,29 @@
     </div>
 
     <div id="toast" class="hidden"></div>
+    <!-- Modal for Instructions -->
+    <div class="modal fade" id="instructionsModal" tabindex="-1" aria-labelledby="instructionsModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="instructionsModalLabel">Instructions</h5>
+                </div>
+                <div class="modal-body">
+                    <h4>How to Play:</h4>
+                    <ol>
+                        <li>Start at the top-left corner and reach the bottom-right corner.</li>
+                        <li>Pick up cherries by moving right or down through cells with cherries.</li>
+                        <li>Avoid thorns, represented by cells with blocks.</li>
+                        <li>After reaching the bottom-right corner, return to the top-left corner.</li>
+                        <li>The game ends when you cannot find a path or return to the starting point.</li>
+                    </ol>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" data-dismiss="modal">Got it!</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <div class="container">
         <h2>Please play the game:</h2>
@@ -305,6 +327,24 @@
     <!-- Include jQuery -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
+        $(document).ready(function () {
+            // Show instructions modal when the page loads for the first time
+            $('#instructionsModal').modal('show');
+
+            // Event listener for the "hidden.bs.modal" event of the instructions modal
+            $('#instructionsModal').on('hidden.bs.modal', function () {
+                // Continue the game when the modal is closed
+                initializeGrid();
+            });
+
+            // Event listener for the "click" event of the "Got It" button in the instructions modal
+            $('#instructionsModal .btn-primary').click(function () {
+                // Close the instructions modal
+                $('#instructionsModal').modal('hide');
+            });
+        });
+
+
         $(document).ready(function () {
             var selectedRow = 0;
             var selectedCol = 0;
@@ -371,15 +411,22 @@
                 resetGame();
             });
 
-            // Function to check if positions (0,0) and (2,2) have blocked icons
             function checkGameOver() {
                 var isCell00Blocked = isCellBlocked(0, 0);
                 var isCell22Blocked = isCellBlocked(2, 2);
 
                 if (isCell00Blocked && isCell22Blocked) {
-                    // Both positions are blocked, trigger the game over alert
+                    // Both starting and ending positions are blocked
                     showMessage('Game Over! Both starting and ending positions are blocked.');
-                    //resetGame();
+                    // resetGame();
+                } else if (isCell00Blocked) {
+                    // Position [0,0] contains a blocked icon
+                    showMessage('Game Over! Starting position is blocked.');
+                    // resetGame();
+                } else if (isCell22Blocked) {
+                    // Position [2,2] contains a blocked icon
+                    showMessage('Game Over! Ending position is blocked.');
+                    // resetGame();
                 }
             }
 

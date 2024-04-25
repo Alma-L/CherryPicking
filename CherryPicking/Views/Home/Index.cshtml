@@ -219,11 +219,11 @@
                 opacity: 0.8;
             }
 
-             /* Button style */
-             .btn {
-               background-color: #950740;
-               border-color: #950740;
-             }
+        /* Button style */
+        .btn {
+            background-color: #950740;
+            border-color: #950740;
+        }
 
             .btn:hover {
                 background-color: #74062c;
@@ -328,13 +328,23 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
         $(document).ready(function () {
+            var selectedRow = 0;
+            var selectedCol = 0;
+            var initialGridState = null;
+            var instructionModalOpen = true;
+
             // Show instructions modal when the page loads for the first time
             $('#instructionsModal').modal('show');
 
-            // Event listener for the "hidden.bs.modal" event of the instructions modal
             $('#instructionsModal').on('hidden.bs.modal', function () {
-                // Continue the game when the modal is closed
+                instructionModalOpen = false; // Set the flag to false when instruction modal is closed
                 initializeGrid();
+                checkGameOver(); // Call checkGameOver() after closing the instruction modal
+            });
+
+            // Event handler for the "shown.bs.modal" event of the instructions modal
+            $('#instructionsModal').on('shown.bs.modal', function () {
+                instructionModalOpen = true; // Set the flag to true when instruction modal is opened
             });
 
             // Event listener for the "click" event of the "Got It" button in the instructions modal
@@ -342,14 +352,6 @@
                 // Close the instructions modal
                 $('#instructionsModal').modal('hide');
             });
-        });
-
-
-        $(document).ready(function () {
-            var selectedRow = 0;
-            var selectedCol = 0;
-            var initialGridState = null;
-
 
             // Function to initialize the grid with the initial state
             function initializeGrid() {
@@ -412,21 +414,20 @@
             });
 
             function checkGameOver() {
-                var isCell00Blocked = isCellBlocked(0, 0);
-                var isCell22Blocked = isCellBlocked(2, 2);
+                if (!instructionModalOpen) { // Only check for game over if instruction modal is not open
+                    var isCell00Blocked = isCellBlocked(0, 0);
+                    var isCell22Blocked = isCellBlocked(2, 2);
 
-                if (isCell00Blocked && isCell22Blocked) {
-                    // Both starting and ending positions are blocked
-                    showMessage('Game Over! Both starting and ending positions are blocked.');
-                    // resetGame();
-                } else if (isCell00Blocked) {
-                    // Position [0,0] contains a blocked icon
-                    showMessage('Game Over! Starting position is blocked.');
-                    // resetGame();
-                } else if (isCell22Blocked) {
-                    // Position [2,2] contains a blocked icon
-                    showMessage('Game Over! Ending position is blocked.');
-                    // resetGame();
+                    if (isCell00Blocked && isCell22Blocked) {
+                        // Both starting and ending positions are blocked
+                        showMessage('Game Over! Both starting and ending positions are blocked.');
+                    } else if (isCell00Blocked) {
+                        // Position [0,0] contains a blocked icon
+                        showMessage('Game Over! Starting position is blocked.');
+                    } else if (isCell22Blocked) {
+                        // Position [2,2] contains a blocked icon
+                        showMessage('Game Over! Ending position is blocked.');
+                    }
                 }
             }
 

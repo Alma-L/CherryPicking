@@ -14,18 +14,7 @@ namespace CherryPicking.Controllers
 
         public IActionResult Index()
         {
-            // Initialize a 3x3 grid with random values (-1, 0, 1)
-            int[][] initialGrid = new int[3][];
-            Random random = new Random();
-
-            for (int i = 0; i < 3; i++)
-            {
-                initialGrid[i] = new int[3];
-                for (int j = 0; j < 3; j++)
-                {
-                    initialGrid[i][j] = random.Next(-1, 2); // Generates random value: -1, 0, or 1
-                }
-            }
+            int[][] initialGrid = GenerateValidGrid();
 
             var model = new CherryPickerModel
             {
@@ -34,6 +23,36 @@ namespace CherryPicking.Controllers
 
             return View(model);
         }
+
+        private int[][] GenerateValidGrid()
+        {
+            int[][] initialGrid = new int[3][];
+            Random random = new Random();
+
+            bool validGrid = false;
+
+            while (!validGrid)
+            {
+                for (int i = 0; i < 3; i++)
+                {
+                    initialGrid[i] = new int[3];
+                    for (int j = 0; j < 3; j++)
+                    {
+                        initialGrid[i][j] = random.Next(-1, 2); // Generates random value: -1, 0, or 1
+                    }
+                }
+
+                if ((initialGrid[0][0] != -1 && initialGrid[2][2] != -1) || (initialGrid[0][0] != -1 || initialGrid[2][2] != -1))
+                {
+                    validGrid = true;
+                }
+
+            }
+
+            return initialGrid;
+        }
+
+
 
         [HttpPost]
         public IActionResult CalculateCherries([FromBody] int[][] grid)

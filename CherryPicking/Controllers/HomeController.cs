@@ -42,16 +42,14 @@ namespace CherryPicking.Controllers
                     }
                 }
 
-                if ((initialGrid[0][0] != -1 && initialGrid[2][2] != -1) || (initialGrid[0][0] != -1 || initialGrid[2][2] != -1))
+                if ((initialGrid[0][0] != -1 && initialGrid[2][2] != -1) || (initialGrid[0][0] != -1 && initialGrid[2][2] == -1) || (initialGrid[0][0] == -1 && initialGrid[2][2] != -1))
                 {
                     validGrid = true;
                 }
-
             }
 
             return initialGrid;
         }
-
 
 
         [HttpPost]

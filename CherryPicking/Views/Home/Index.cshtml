@@ -12,6 +12,7 @@
             color: #fff; /* Set text color */
             margin: 0; /* Remove default margin */
             padding: 0; /* Remove default padding */
+            overflow:hidden;
         }
 
         .grid-container {
@@ -144,6 +145,7 @@
             justify-content: center;
             align-items: center;
             flex-direction: column;
+            margin-top: -10px;
         }
 
         .btn-container, .result-container {
@@ -214,10 +216,10 @@
             outline: none;
         }
 
-            .close:hover {
-                color: #fff;
-                opacity: 0.8;
-            }
+      .close:hover {
+          color: #fff;
+          opacity: 0.8;
+       }
 
         /* Button style */
         .btn {
@@ -225,15 +227,32 @@
             border-color: #950740;
         }
 
-            .btn:hover {
-                background-color: #74062c;
-                border-color: #74062c;
-            }
+       .btn:hover {
+           background-color: #74062c;
+           border-color: #74062c;
+       }
 
         /* Text color */
         #messageBody, #messageModalLabel {
             color: #fff;
         }
+
+        .label {
+            text-align: center; /* Center the label text */
+            font-size: 12px; /* Adjust font size as needed */
+           /*  margin-top: 5px; */ /* Add margin on top of the label */
+            color: white; /* Set text color */
+        }
+
+        .cell-wrapper {
+            position: relative; /* Position the wrapper relative to its container */
+        }
+
+         /* Add margin to each row except the last one */
+        .table-bordered tbody tr:not(:last-child) {
+            margin-bottom: 7px;
+        } 
+
 
     </style>
 </head>
@@ -241,7 +260,6 @@
     <div class="header">
         <h1 class="text-center">Welcome to Fruit Pickup Game</h1>
     </div>
-
     <div id="toast" class="hidden"></div>
     <!-- Modal for Instructions -->
     <div class="modal fade" id="instructionsModal" tabindex="-1" aria-labelledby="instructionsModalLabel" aria-hidden="true">
@@ -266,6 +284,25 @@
             </div>
         </div>
     </div>
+    <!-- New Modal for Alert -->
+    <div class="modal fade" id="positionAlertModal" tabindex="-1" aria-labelledby="positionAlertModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="positionAlertModalLabel">Alert</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <p>You must return to the starting position to calculate cherries.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <div class="container">
         <h2>Please play the game:</h2>
@@ -277,20 +314,31 @@
                         @for (int j = 0; j < Model.Grid[i].Length; j++)
                         {
                             <td class="table-data">
-                                <button class="cell btn btn-outline-dark" data-row="@i" data-col="@j" data-value="@Model.Grid[i][j]">
-                                    @if (Model.Grid[i][j] == 1)
+                                <div class="cell-wrapper">
+                                    <button class="cell btn btn-outline-dark" data-row="@i" data-col="@j" data-value="@Model.Grid[i][j]">
+                                        @if (Model.Grid[i][j] == 1)
+                                        {
+                                            <span class="fruit">&#127826;</span>
+                                        }
+                                        else if (Model.Grid[i][j] == -1)
+                                        {
+                                            <span class="block">&#128683;</span>
+                                        }
+                                    </button>
+                                    @if (i == 0 && j == 0)
                                     {
-                                        <span class="fruit">&#127826;</span>
+                                        <div class="label">Start Position</div> <!-- Label -->
                                     }
-                                    else if (Model.Grid[i][j] == -1)
+                                    @if (i == 2 && j == 2)
                                     {
-                                        <span class="block">&#128683;</span>
+                                        <div class="label">End Position</div> <!-- Label -->
                                     }
-                                </button>
+                                </div>
                             </td>
                         }
                     </tr>
                 }
+
             </tbody>
         </table>
         <div class="result-container">
@@ -569,8 +617,25 @@
                 // }, 1000); // 1000 milliseconds = 1 second
             });
 
+            // Event handler for the close button in the position alert modal footer
+            $('#positionAlertModal .modal-footer .btn-secondary').click(function () {
+                $('#positionAlertModal').modal('hide'); // Close the position alert modal
+            });
+
+            // Event handler for the close button in the position alert modal header
+            $('#positionAlertModal .modal-header .close').click(function () {
+                $('#positionAlertModal').modal('hide'); // Close the position alert modal
+            });
+
             // Button click event handler for calculating cherries
             $('#calculateCherriesBtn').click(function () {
+                var isCell00Selected = $('button[data-row="0"][data-col="0"]').hasClass('selected-cell');
+
+                // Check if the selected cell is at position 0,0
+                if (!isCell00Selected) {
+                    $('#positionAlertModal').modal('show'); // Show the alert modal
+                    return; // Exit the function if not at position 0,0
+                }
 
                 // Restore the initial grid state before calculating cherries
                 initializeGrid();
@@ -606,6 +671,8 @@
                     }
                 });
             });
+
+
         });
     </script>
 </body>

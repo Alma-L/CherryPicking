@@ -12,7 +12,7 @@
             color: #fff; /* Set text color */
             margin: 0; /* Remove default margin */
             padding: 0; /* Remove default padding */
-            overflow:hidden;
+            overflow: hidden;
         }
 
         .grid-container {
@@ -216,10 +216,10 @@
             outline: none;
         }
 
-      .close:hover {
-          color: #fff;
-          opacity: 0.8;
-       }
+            .close:hover {
+                color: #fff;
+                opacity: 0.8;
+            }
 
         /* Button style */
         .btn {
@@ -227,10 +227,10 @@
             border-color: #950740;
         }
 
-       .btn:hover {
-           background-color: #74062c;
-           border-color: #74062c;
-       }
+            .btn:hover {
+                background-color: #74062c;
+                border-color: #74062c;
+            }
 
         /* Text color */
         #messageBody, #messageModalLabel {
@@ -240,7 +240,7 @@
         .label {
             text-align: center; /* Center the label text */
             font-size: 12px; /* Adjust font size as needed */
-           /*  margin-top: 5px; */ /* Add margin on top of the label */
+            /*  margin-top: 5px; */ /* Add margin on top of the label */
             color: white; /* Set text color */
         }
 
@@ -248,11 +248,44 @@
             position: relative; /* Position the wrapper relative to its container */
         }
 
-         /* Add margin to each row except the last one */
+        /* Add margin to each row except the last one */
         .table-bordered tbody tr:not(:last-child) {
             margin-bottom: 7px;
-        } 
+        }
 
+        .pointer {
+            position: absolute;
+            width: 20px; /* Increase the width */
+            height: 20px; /* Increase the height */
+            background-color: yellow; /* Change the color to yellow */
+            border-radius: 50%; /* Make it round */
+            display: none; /* Initially hide the pointer */
+            z-index: 999; /* Ensure it appears above other elements */
+            animation: pulse 1s infinite alternate; /* Add a pulsating animation */
+        }
+
+
+        /* Style for the select element */
+        #selectedOption {
+            color: white; /* Set default text color to black */
+            background-color: #950740; /* Match the color of the Calculate Cherries button */
+            border-color: #950740; /* Match the border color of the Calculate Cherries button */
+            width: 150px; /* Set width */
+            height: 38px; /* Set height */
+            border-radius: 5px; /* Set border radius */
+        }
+
+            /* Style for the options in the select element */
+            #selectedOption option {
+                color: white; /* Set text color of options to black */
+                background-color: #950740; /* Set background color of options to white */
+            }
+
+            /* Style for the select element when hovered */
+            #selectedOption:hover {
+                background-color: #74062c; /* Darken the background color on hover */
+                border-color: #74062c; /* Darken the border color on hover */
+            }
 
     </style>
 </head>
@@ -303,7 +336,7 @@
             </div>
         </div>
     </div>
-
+    <div class="pointer"></div>
     <div class="container">
         <h2>Please play the game:</h2>
         <table id="gridTable" class="table table-bordered">
@@ -349,6 +382,12 @@
         <div class="btn-container">
             <button id="resetGameBtn" class="btn btn-outline-primary">Reset Game</button>
             <button id="calculateCherriesBtn" class="btn btn-outline-primary ml-2">Calculate Cherries</button>
+            <select id="selectedOption" class="ml-2">
+                <option value="myOption">My Algorithm</option>
+                <option value="solution1">Second Algorithm</option>
+                <option value="solution2">Third Algorithm</option>
+            </select>
+
         </div>
     </div>
 
@@ -399,6 +438,49 @@
             $('#instructionsModal .btn-primary').click(function () {
                 // Close the instructions modal
                 $('#instructionsModal').modal('hide');
+            });
+
+            $(document).ready(function () {
+                // Function to move the pointer to the selected cell
+                function movePointer() {
+                    var selectedCell = $('.selected-cell');
+                    if (selectedCell.length > 0) {
+                        var cellPosition = selectedCell.position(); // Get position relative to the grid
+                        var cellPadding = parseInt(selectedCell.css('padding-left')); // Get padding of the cell
+                        var pointer = $('.pointer'); // Get the pointer element
+
+                        // Calculate pointer position relative to the grid
+                        var pointerLeft = cellPosition.left + cellPadding;
+                        var pointerTop = cellPosition.top + cellPadding;
+
+                        // Adjust pointer position to center it within the cell
+                        pointerLeft += (selectedCell.outerWidth() - pointer.width()) / 2;
+                        pointerTop += (selectedCell.outerHeight() - pointer.height()) / 2;
+
+                        // Update pointer position
+                        pointer.css({
+                            left: pointerLeft,
+                            top: pointerTop,
+                            display: 'block' // Show the pointer when a cell is selected
+                        });
+                    } else {
+                        $('.pointer').hide(); // Hide the pointer when no cell is selected
+                    }
+                }
+
+                // Function to handle cell selection
+                function handleCellSelection(row, col) {
+                    $('.cell').removeClass('selected-cell'); // Remove selected class from all cells
+                    $('button[data-row="' + row + '"][data-col="' + col + '"]').addClass('selected-cell'); // Add selected class to the clicked cell
+                    movePointer(); // Move the pointer to the selected cell
+                }
+
+                // Event listener for cell button clicks
+                $('.cell').click(function () {
+                    var row = parseInt($(this).data('row'));
+                    var col = parseInt($(this).data('col'));
+                    handleCellSelection(row, col); // Handle cell selection
+                });
             });
 
             // Function to initialize the grid with the initial state
@@ -459,6 +541,10 @@
             $('#messageModal .modal-header .close').click(function () {
                 closeModal();
                 resetGame();
+            });
+
+            $('#messageModal').on('hidden.bs.modal', function () {
+                checkGameOver(); // Call checkGameOver() after closing the message modal 
             });
 
             function checkGameOver() {
@@ -627,6 +713,11 @@
                 $('#positionAlertModal').modal('hide'); // Close the position alert modal
             });
 
+            // Event listener for the select input to update selectedOption in real-time
+            $('#selectedOption').change(function () {
+                selectedOption = $(this).val(); // Update selectedOption with the newly selected value
+            });
+
             // Button click event handler for calculating cherries
             $('#calculateCherriesBtn').click(function () {
                 var isCell00Selected = $('button[data-row="0"][data-col="0"]').hasClass('selected-cell');
@@ -639,6 +730,9 @@
 
                 // Restore the initial grid state before calculating cherries
                 initializeGrid();
+
+                // Get the selected option
+                var selectedOption = $('#selectedOption').val(); // Update selectedOption with the current value
 
                 // Perform the calculation
                 var grid = [];
@@ -655,12 +749,12 @@
                     url: '/Home/CalculateCherries',
                     type: 'POST',
                     contentType: 'application/json',
-                    data: JSON.stringify(grid),
+                    data: JSON.stringify({ grid: grid, selectedOption: selectedOption }), // Include the selected option in the data
                     success: function (data) {
                         console.log(data); // Log the entire response data
                         $('#idresults').text(data.maxCherries);
                         if (data.maxCherries === 0) {
-                            showMessage('Sorry to inform, algorithm can not calculate your fruit picked.');
+                            showMessage('Sorry to inform, algorithm cannot calculate your fruit picked.');
                         } else {
                             var cherriesPickedMessage = 'You have picked ' + data.maxCherries + ' cherries.';
                             showMessage(cherriesPickedMessage);
@@ -671,7 +765,6 @@
                     }
                 });
             });
-
 
         });
     </script>

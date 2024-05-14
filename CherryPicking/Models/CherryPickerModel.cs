@@ -1,16 +1,11 @@
 ﻿namespace CherryPicking.Models
 {
-    //    public class CherryPickerModel
-    //    {
-    //        public int[][] Grid { get; set; }
-    //        public int MaxCherries { get; set; }
-
-    //    }
-    //}
+  
     public class CherryPickerModel
     {
         public int[][] Grid { get; set; } = new int[3][];
         public int MaxCherries { get; set; }
+        public string SelectedOption { get; set; } = string.Empty;
 
         public CherryPickerModel()
         {

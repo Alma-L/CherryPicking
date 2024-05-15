@@ -12,7 +12,7 @@
             color: #fff; /* Set text color */
             margin: 0; /* Remove default margin */
             padding: 0; /* Remove default padding */
-            overflow: hidden;
+            overflow-y: scroll;
         }
 
         .grid-container {
@@ -26,17 +26,22 @@
             margin-bottom: 50px; /* Add margin at the bottom */
         }
 
-        .header {
-            background-color: #333; /* Set header and footer background color */
-            color: #fff; /* Set header and footer text color */
-            padding: 10px; /* Add padding */
-            width: 100%; /* Full width */
-            left: 0; /* Align left */
-        }
+      
 
         .header {
             top: 0; /* Align header to the top */
             position: fixed; /* Fixed position for header */
+        }
+
+        .header {
+            background-color: #333; /* Set header background color */
+            color: #fff; /* Set header text color */
+            padding: 10px; /* Add padding */
+            width: 100%; /* Full width */
+            left: 0; /* Align left */
+            top: 0; /* Align header to the top */
+            position: fixed; /* Fixed position for header */
+            z-index: 999; /* Ensure it appears above other elements */
         }
 
         .footer {
@@ -145,7 +150,7 @@
             justify-content: center;
             align-items: center;
             flex-direction: column;
-            margin-top: -10px;
+            gap:1.5rem;
         }
 
         .btn-container, .result-container {
@@ -287,6 +292,36 @@
                 border-color: #74062c; /* Darken the border color on hover */
             }
 
+        #gridSize {
+            color: white; /* Set default text color to black */
+            background-color: #950740; /* Match the color of the Calculate Cherries button */
+            border-color: #950740; /* Match the border color of the Calculate Cherries button */
+            width: 150px; /* Set width */
+            height: 38px; /* Set height */
+            border-radius: 5px; /* Set border radius */
+        }
+
+            /* Style for the options in the select element */
+            #gridSize option {
+                color: white; /* Set text color of options to black */
+                background-color: #950740; /* Set background color of options to white */
+            }
+
+            /* Style for the select element when hovered */
+            #gridSize:hover {
+                background-color: #74062c; /* Darken the background color on hover */
+                border-color: #74062c; /* Darken the border color on hover */
+            }
+            .form{
+                display:flex;
+                align-items:center;
+                justify-content:center;
+                gap:1.5rem;
+            }
+
+        .btn-form{
+            margin-bottom:22px;
+        }
     </style>
 </head>
 <body>
@@ -362,7 +397,7 @@
                                     {
                                         <div class="label">Start Position</div> <!-- Label -->
                                     }
-                                    @if (i == 2 && j == 2)
+                                    @if (i == Model.Grid[i].Length-1 && j == Model.Grid[i].Length-1)
                                     {
                                         <div class="label">End Position</div> <!-- Label -->
                                     }
@@ -387,7 +422,18 @@
                 <option value="solution1">Second Algorithm</option>
                 <option value="solution2">Third Algorithm</option>
             </select>
-
+        </div>
+        <div class="btn-container">
+           
+            <form method="post" action="/" class="form">
+                <label for="gridSize">Select Grid Size:</label>
+                <select id="gridSize" name="gridSize">
+                    <option value="3">3x3</option>
+                    <option value="4">4x4</option>
+                    <option value="6">6x6</option>  
+                </select>
+                <button class="btn btn-outline-primary ml-2 btn-form" type="submit">Submit</button>
+            </form>
         </div>
     </div>
 
@@ -718,6 +764,10 @@
                 selectedOption = $(this).val(); // Update selectedOption with the newly selected value
             });
 
+            $('#gridSize').change(function () {
+                gridSize = $(this).val(); // Update selectedOption with the newly selected value
+            });
+
             // Button click event handler for calculating cherries
             $('#calculateCherriesBtn').click(function () {
                 var isCell00Selected = $('button[data-row="0"][data-col="0"]').hasClass('selected-cell');
@@ -733,6 +783,8 @@
 
                 // Get the selected option
                 var selectedOption = $('#selectedOption').val(); // Update selectedOption with the current value
+
+                var gridSize = $('#gridSize').val();
 
                 // Perform the calculation
                 var grid = [];

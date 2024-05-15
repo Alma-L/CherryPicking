@@ -1,19 +1,35 @@
 ﻿namespace CherryPicking.Models
 {
-  
+
     public class CherryPickerModel
     {
-        public int[][] Grid { get; set; } = new int[3][];
+        public int[][] Grid { get; set; }
         public int MaxCherries { get; set; }
         public string SelectedOption { get; set; } = string.Empty;
+        public int GridSize { get; set; }
 
         public CherryPickerModel()
         {
-            for (int i = 0; i < 3; i++)
+            // Default grid size is 4x4
+            GridSize = 3;
+            InitializeGrid();
+        }
+
+        public CherryPickerModel(int gridSize)
+        {
+            GridSize = gridSize;
+            InitializeGrid();
+        }
+
+        private void InitializeGrid()
+        {
+            Grid = new int[GridSize][];
+            for (int i = 0; i < GridSize; i++)
             {
-                Grid[i] = new int[3];
+                Grid[i] = new int[GridSize];
             }
         }
     }
+
 }
 

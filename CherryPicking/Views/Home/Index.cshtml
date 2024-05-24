@@ -424,7 +424,6 @@
             </select>
         </div>
         <div class="btn-container">
-           
             <form method="post" action="/" class="form">
                 <label for="gridSize">Select Grid Size:</label>
                 <select id="gridSize" name="gridSize">
@@ -484,6 +483,14 @@
             $('#instructionsModal .btn-primary').click(function () {
                 // Close the instructions modal
                 $('#instructionsModal').modal('hide');
+            });
+
+            $(document).ready(function () {
+                $('#gridSize').change(function () {
+                    var selectedGridSize = $(this).val();
+                    console.log("Selected Grid Size:", selectedGridSize);
+                    // You can perform any actions you need based on the selected grid size
+                });
             });
 
             $(document).ready(function () {
@@ -764,10 +771,6 @@
                 selectedOption = $(this).val(); // Update selectedOption with the newly selected value
             });
 
-            $('#gridSize').change(function () {
-                gridSize = $(this).val(); // Update selectedOption with the newly selected value
-            });
-
             // Button click event handler for calculating cherries
             $('#calculateCherriesBtn').click(function () {
                 var isCell00Selected = $('button[data-row="0"][data-col="0"]').hasClass('selected-cell');
@@ -783,8 +786,6 @@
 
                 // Get the selected option
                 var selectedOption = $('#selectedOption').val(); // Update selectedOption with the current value
-
-                var gridSize = $('#gridSize').val();
 
                 // Perform the calculation
                 var grid = [];

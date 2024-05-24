@@ -1,6 +1,6 @@
+using CherryPicking.Helpers;
 using CherryPicking.Models;
 using Microsoft.AspNetCore.Mvc;
-using CherryPicking.Helpers;
 
 
 namespace CherryPicking.Controllers
@@ -38,49 +38,6 @@ namespace CherryPicking.Controllers
 
             return View(model);
         }
-
-
-
-        //public IActionResult Index()
-        //{
-        //    // Initialize a 3x3 grid with random values (-1, 0, 1)
-        //    int[][] initialGrid = new int[3][];
-        //    Random random = new Random();
-
-
-        //    for (int i = 0; i < 3; i++)
-        //    {
-        //        initialGrid[i] = new int[3];
-        //        for (int j = 0; j < 3; j++)
-        //        {
-        //            initialGrid[i][j] = random.Next(-1, 2); // Generates random value: -1, 0, or 1
-        //        }
-        //    }
-
-
-        //    var model = new CherryPickerModel
-        //    {
-        //        Grid = initialGrid
-        //    };
-
-
-        //    return View(model);
-        //}
-
-
-        //[HttpPost]
-        //public IActionResult CalculateCherries([FromBody] int[][] grid)
-        //{
-        //    if (grid == null)
-        //    {
-        //        return BadRequest("Grid data is null.");
-        //    }
-
-
-        //    int maxCherries = CherryPickup(grid);
-        //    return Json(new { maxCherries });
-        //}
-
 
         [HttpPost]
         public IActionResult CalculateCherries([FromBody] CherryPickerModel request)

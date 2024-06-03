@@ -12,4 +12,6 @@ Starting at the position (0, 0) and reaching (n - 1, n - 1) by moving right or d
 After reaching (n - 1, n - 1), returning to (0, 0) by moving left or up through valid path cells.
 When passing through a path cell containing a cherry, you pick it up, and the cell becomes an empty cell 0.
 If there is no valid path between (0, 0) and (n - 1, n - 1), then no cherries can be collected.
+
+Link to check the game: http://www.fruitpickup.somee.com/
  
